@@ -1,6 +1,19 @@
 {
   "timeZone": "Asia/Tokyo",
   "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "Parser",
+        "version": "8",
+        "libraryId": "1Mc8BthYthXx6CoIz90-JiSzSafVnT6U3t0z_W3hLTAX5ek4w0G_EIrNw"
+      },
+      {
+        "userSymbol": "SO",
+        "version": "1",
+        "libraryId": "1tBHUCVx5DiwUCsGqjZb-yAtxkhS-Bef5RKo7NG2l-joC8IxdUqmoJcDR",
+        "developmentMode": false
+      }
+    ]
   },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8"

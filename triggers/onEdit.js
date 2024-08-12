@@ -3,12 +3,6 @@
  * @see https://developers.google.com/apps-script/guides/triggers#onedite
  */
 function onEdit(e) {
-  // const range = e.range;
-  // const sheet = range.getSheet();
-  // const editedCol = range.getColumn();
-  // const value = sheet.getRange(1, editedCol).getValue();
-  // const validTitle_List = ["ボイスの規定値"]
-
   // 編集された範囲の情報を取得
   const range = e.range;
   const sheet = range.getSheet();
@@ -17,7 +11,9 @@ function onEdit(e) {
   const validCellRange = "B11";
 
   // 編集されたシート名と範囲を確認
-  if (sheet.getName() === validSheetName && range.getA1Notation() === validCellRange) {
+  const pass1 = sheet.getName() === validSheetName; // 編集されたシート名
+  const pass2 = range.getA1Notation() === validCellRange; // 編集された範囲
+  if (pass1 && pass2) {
     const editedCell = sheet.getActiveCell();
     const newValue = editedCell.getValue();
     const targetVoiceList = getTargetVoiceListFromEnvSheet(newValue);
@@ -31,21 +27,22 @@ function onEdit(e) {
 
 /**
  * 環境シートから指定されたセット名に対応するボイスリストを取得する関数
- *
+ * 
  * @param {string} setName - 検索するセット名
  * @return {Array.<string>} - セット名に対応するボイスリスト (2次元配列)
  */
 function getTargetVoiceListFromEnvSheet(setName) {
   const voiceEnvSheetName = "ボイス設定";
+  const startCol_voiceSet = 3;
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const envSheet = ss.getSheetByName(voiceEnvSheetName);
 
   const lastCol = envSheet.getLastColumn();
-  const setNameList = envSheet.getRange(2, 1, 1, lastCol).getValues().flat();
+  const setNameList = envSheet.getRange(2, startCol_voiceSet, 1, lastCol).getValues().flat();
   const tarIdx = setNameList.findIndex(item => item === setName);
 
   if (tarIdx >= 0) { // 指定されたセット名が見つかった場合
-    const tarCol = 1 + tarIdx;
+    const tarCol = startCol_voiceSet + tarIdx;
     const targetValue = envSheet.getRange(4, tarCol, envSheet.getLastRow(), 2).getValues();
 
     return targetValue;
