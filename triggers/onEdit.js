@@ -13,7 +13,7 @@ function onEdit(e) {
   // 編集されたシート名と範囲を確認
   const pass1 = sheet.getName() === validSheetName; // 編集されたシート名
   const pass2 = range.getA1Notation() === validCellRange; // 編集された範囲
-  if (pass1 && pass2) {
+  if (pass1 && pass2) { // 『ボイス設定』のプルタブの値に合わせてボイスリストを設置する処理
     const editedCell = sheet.getActiveCell();
     const newValue = editedCell.getValue();
     const targetVoiceList = getTargetVoiceListFromEnvSheet(newValue);

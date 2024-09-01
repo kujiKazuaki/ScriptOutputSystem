@@ -1,6 +1,7 @@
 /** @type {string} あにまんchのURL */
 const ANIMAN = /http(?:s):\/\/animanch\.com\/archives\//;
 
+/** @type {Object.<string, Object>} 処理のための元データが格納されるオブジェクト */
 const DATASET = {
   "menu": null,
   "env": null,
@@ -102,7 +103,6 @@ function SetEnv() {
     errMSG = "『セッティング』シートの『E8』はチェックボックスになっていません。\nチェックボックスを設置してください。";
     errLogList.push(errMSG);
   }
-  // l("scrapingURL", scrapingURL, scrapingCheck)
 
   /**
    * ボイスの設定
@@ -110,9 +110,11 @@ function SetEnv() {
   const lastLow = settingSheet.getLastRow();
   const startRow_voice = 13;
   const sumVoiceRows = lastLow - startRow_voice + 1;
-  let voiceList = settingSheet.getRange(startRow_voice, 2, sumVoiceRows, 2).getValues();
-  voiceList = voiceList.filter(item => !(item[0] === "" || item[1] === ""))
-  voiceList = voiceList.map(item => { return { 'name': item[0], 'gender': item[1] } })
+  const voiceList = settingSheet
+    .getRange(startRow_voice, 2, sumVoiceRows, 2)
+    .getValues()
+    .filter(item => !(item[0] === "" || item[1] === ""))
+    .map(item => { return { 'name': item[0], 'gender': item[1] } });
 
   const maleList = voiceList.filter(item => item.gender === "男性");
   const femaleList = voiceList.filter(item => item.gender === "女性");

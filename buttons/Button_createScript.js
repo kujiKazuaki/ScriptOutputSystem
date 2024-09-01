@@ -36,7 +36,6 @@ function createScriptSystem() {
   SetEnv() // DataSetを以下処理で正常に使用できるようにするためにセッティングする
   const ss = SpreadsheetApp.getActiveSpreadsheet()
   let baseUrl = DATASET.env.url;
-  baseUrl = 'https://animanch.com/archives/20946628.html';
 
   console.log("scriptOutput", DATASET.env.scriptOutput)
   console.log("url", baseUrl)
@@ -54,7 +53,6 @@ function createScriptSystem() {
   /**
    * 各シートへの出力処理
    */
-  const sheetNamePlug = "出力対象シート"
   commentList.forEach((comment, i) => {
     // ボイスとセリフが格納された2次元配列
     let voiceAndScriptList = getVoiceAndScriptList(DATASET.env.voice, DATASET.env.voiceRegex, comment)
@@ -84,7 +82,7 @@ function Helper_changeToFullFromHalf(str) {
  * @param {string} animanURL - スクレイピング先のURL
  * @return {Array.<Array.<Array.<string>>>} - 対象URLのコメントに関するリスト
  */
-function parserAniman(animanURL = "https://animanch.com/archives/20946628.html") {
+function parserAniman(animanURL) {
   /**
    * 初期設定
    */
@@ -95,12 +93,15 @@ function parserAniman(animanURL = "https://animanch.com/archives/20946628.html")
       'Accept-Language': 'ja-JP'
     }
   };
-  const encodeType = "utf-8"; // エンコードタイプ
+  const encodeType = "UTF-8"; // エンコードタイプ
 
   // スクレイピング処理を共通化した関数
-  const fetchAndProcessComments = (content, fromClass, toClass) => {
-    const commentsContent = Parser.data(content).from(fromClass).to(toClass).iterate(); // 指定範囲からコメントを取得
-    const formattedScripts = formatScripts(commentsContent); // コメントを整理
+  const fetchAndProcessComments = (content, headerPair, commentPair) => {
+    const headerList = Parser.data(content).from(headerPair.from).to(headerPair.to).iterate()
+    const commentList = Parser.data(content).from(commentPair.from).to(commentPair.to).iterate()
+    const formattedScripts = formatScripts(headerList, commentList); // コメントを整理
+
+    console.log('formattedScripts', formattedScripts)
     return sortResponsesByNumber(formattedScripts).filter(item => item[0] !== ''); // 整理されたコメントをレス番号でソート
   };
 
@@ -108,21 +109,24 @@ function parserAniman(animanURL = "https://animanch.com/archives/20946628.html")
    * 本スレッドのスクレイピング
    */
   const response = UrlFetchApp.fetch(animanURL, options); // HTTPレスポンスオブジェクト
-  let content = response.getContentText(encodeType);
+  const content = response.getContentText(encodeType);
 
   // 本スレッドのコメントを処理
-  const outputScriptList_MainThread = fetchAndProcessComments(content, 'class="res"', 'class="res"');
+  let headerPair = { 'from': 'class="t_h"', 'to': '</div>' };
+  let commentPair = { 'from': 'class="t_b"', 'to': '</div>' };
+  const mainContents = fetchAndProcessComments(content, headerPair, commentPair);
 
   /**
    * サブスレッド内容のスクレイピング
    */
-  // const content_SubThread = Parser.data(content).from('class="commentnumber"').to('</div').iterate(); // サブスレッド番号を取得
-  const outputScriptList_SubThread = fetchAndProcessComments(content, 'class="commentbody"', '</div>'); // サブスレッドのコメントを処理
+  headerPair = { 'from': 'class="commentheader"', 'to': '</div>' };
+  commentPair = { 'from': 'class="commentbody"', 'to': '</div>' };
+  const subContents = fetchAndProcessComments(content, headerPair, commentPair); // サブスレッドのコメントを処理
 
   /**
    * 戻り値
    */
-  return [outputScriptList_MainThread, outputScriptList_SubThread];
+  return [mainContents, subContents];
 }
 
 /**
