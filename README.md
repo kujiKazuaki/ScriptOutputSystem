@@ -1,8 +1,9 @@
+<!-- 
 # スプレッドシート
 [【あにまんch】台本出力システム](https://docs.google.com/spreadsheets/d/1qQYZ1AvQwvACqRvZFx3LaFvfr0kbPzDPFwyqpP3SBAU/edit?gid=1609864189#gid=1609864189)
 
 - スプレッドシートをコピーしてお使い下さい。
-
+ -->
 # 開発環境セットアップガイド
 
 ## 1. 事前にインストールしておかなければならないツール
